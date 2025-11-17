@@ -10,9 +10,28 @@ INSTALL_ONEAPI="${2:-false}"
 CLASSIC_VERSION="${3:-}"
 ONEAPI_VERSION="${4:-}"
 
-# Source the shared GCC version mapping function
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/intel-gcc-version-map.sh"
+# Determine appropriate GCC version based on Intel compiler version
+# Intel 2023.x series supports GCC up to 12.x
+# Intel 2024.0.x supports GCC up to 13.x
+# Intel 2024.1+ supports GCC up to 14.x
+determine_gcc_version() {
+  local intel_version=$1
+  local major=$(echo $intel_version | cut -d. -f1)
+  local minor=$(echo $intel_version | cut -d. -f2)
+  
+  if [ "$major" = "2023" ]; then
+    echo "12"
+  elif [ "$major" = "2024" ]; then
+    if [ "$minor" = "0" ]; then
+      echo "13"
+    else
+      echo "14"
+    fi
+  else
+    # Default to GCC 13 for unknown versions
+    echo "13"
+  fi
+}
 
 # Find the installed compiler directories
 ONEAPI_ROOT="/opt/intel/oneapi/compiler"

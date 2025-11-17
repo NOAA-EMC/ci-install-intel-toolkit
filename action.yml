@@ -123,7 +123,7 @@ runs:
       if: ${{ steps.intel-cache.outputs.cache-hit != 'true' }}
       shell: ${{ inputs.shell }}
       run: |
-        bash ${{ github.action_path }}/configure-intel-gcc.sh \
+        ${{ github.action_path }}/configure-intel-gcc.sh \
           "${{ inputs.install-classic }}" \
           "${{ inputs.install-oneapi }}" \
           "${{ inputs.classic-version }}" \

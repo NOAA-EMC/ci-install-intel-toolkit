@@ -38,17 +38,23 @@ jobs:
       - name: Test Classic C compilation
         run: |
           icc -v ci/hello.c -o test_c
-          ./test_c
+          output=$(./test_c)
+          echo "$output"
+          echo "$output" | grep -q "Hello from Intel C compiler"
       
       - name: Test Classic C++ compilation
         run: |
           icpc -v ci/hello.cpp -o test_cpp
-          ./test_cpp
+          output=$(./test_cpp)
+          echo "$output"
+          echo "$output" | grep -q "Hello from Intel C++ compiler"
       
       - name: Test Classic Fortran compilation
         run: |
           ifort -v ci/hello.f90 -o test_f90
-          ./test_f90
+          output=$(./test_f90)
+          echo "$output"
+          echo "$output" | grep -q "Hello from Intel Fortran compiler"
 
   test-oneapi-versions:
     name: Test oneAPI v${{ matrix.version }}
@@ -81,17 +87,23 @@ jobs:
       - name: Test oneAPI C compilation
         run: |
           icx -v ci/hello.c -o test_c
-          ./test_c
+          output=$(./test_c)
+          echo "$output"
+          echo "$output" | grep -q "Hello from Intel C compiler"
       
       - name: Test oneAPI C++ compilation
         run: |
           icpx -v ci/hello.cpp -o test_cpp
-          ./test_cpp
+          output=$(./test_cpp)
+          echo "$output"
+          echo "$output" | grep -q "Hello from Intel C++ compiler"
       
       - name: Test oneAPI Fortran compilation
         run: |
           ifx -v ci/hello.f90 -o test_f90
-          ./test_f90
+          output=$(./test_f90)
+          echo "$output"
+          echo "$output" | grep -q "Hello from Intel Fortran compiler"
 
   test-mpi-configurations:
     name: MPI ${{ matrix.mpi-version }} with ${{ matrix.compiler-type }}
@@ -135,12 +147,22 @@ jobs:
       - name: Test MPI C compilation and execution
         run: |
           $CC ci/mpi_hello.c -o mpi_test_c
-          mpirun -n 2 ./mpi_test_c
+          output=$(mpirun -n 2 ./mpi_test_c)
+          echo "$output"
+          rank0_count=$(echo "$output" | grep -c "Hello from MPI rank 0 of 2")
+          rank1_count=$(echo "$output" | grep -c "Hello from MPI rank 1 of 2")
+          [ "$rank0_count" -eq 1 ] || { echo "ERROR: Rank 0 output appeared $rank0_count times (expected 1)"; exit 1; }
+          [ "$rank1_count" -eq 1 ] || { echo "ERROR: Rank 1 output appeared $rank1_count times (expected 1)"; exit 1; }
       
       - name: Test MPI Fortran compilation and execution
         run: |
           $FC ci/mpi_hello.f90 -o mpi_test_f90
-          mpirun -n 2 ./mpi_test_f90
+          output=$(mpirun -n 2 ./mpi_test_f90)
+          echo "$output"
+          rank0_count=$(echo "$output" | grep -c "Hello from MPI rank.*0.*of.*2")
+          rank1_count=$(echo "$output" | grep -c "Hello from MPI rank.*1.*of.*2")
+          [ "$rank0_count" -eq 1 ] || { echo "ERROR: Rank 0 output appeared $rank0_count times (expected 1)"; exit 1; }
+          [ "$rank1_count" -eq 1 ] || { echo "ERROR: Rank 1 output appeared $rank1_count times (expected 1)"; exit 1; }
 
   test-openmp:
     name: OpenMP ${{ matrix.with-openmp && 'enabled' || 'disabled' }}
@@ -166,24 +188,26 @@ jobs:
           env-update: true
       
       - name: Test OpenMP C compilation
-        if: matrix.with-openmp
         run: |
           icx -qopenmp ci/openmp_test.c -o openmp_test_c
           export OMP_NUM_THREADS=4
-          ./openmp_test_c
+          output=$(./openmp_test_c)
+          echo "$output"
+          for thread in 0 1 2 3; do
+            count=$(echo "$output" | grep -c "Hello from OpenMP thread $thread of 4")
+            [ "$count" -eq 1 ] || { echo "ERROR: Thread $thread output appeared $count times (expected 1)"; exit 1; }
+          done
       
       - name: Test OpenMP Fortran compilation
-        if: matrix.with-openmp
         run: |
           ifx -qopenmp ci/openmp_test.f90 -o openmp_test_f90
           export OMP_NUM_THREADS=4
-          ./openmp_test_f90
-      
-      - name: Verify OpenMP not installed
-        if: "!matrix.with-openmp"
-        run: |
-          icx ci/hello.c -o test_c
-          ./test_c
+          output=$(./openmp_test_f90)
+          echo "$output"
+          for thread in 0 1 2 3; do
+            count=$(echo "$output" | grep -c "Hello from OpenMP thread.*$thread.*of.*4")
+            [ "$count" -eq 1 ] || { echo "ERROR: Thread $thread output appeared $count times (expected 1)"; exit 1; }
+          done
 
   test-mkl:
     name: MKL
@@ -209,13 +233,15 @@ jobs:
           env-update: true
       
       - name: Test MKL with C
-        if: matrix.with-mkl
         run: |
           icx ci/mkl_test.c -o mkl_test_c -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
-          ./mkl_test_c
+          output=$(./mkl_test_c)
+          echo "$output"
+          echo "$output" | grep -q "MKL BLAS test successful"
       
       - name: Test MKL with Fortran
-        if: matrix.with-mkl
         run: |
           ifx ci/mkl_test.f90 -o mkl_test_f90 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
-          ./mkl_test_f90
+          output=$(./mkl_test_f90)
+          echo "$output"
+          echo "$output" | grep -q "MKL BLAS Fortran test successful"

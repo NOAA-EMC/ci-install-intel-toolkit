@@ -5,10 +5,10 @@
 
 set -e
 
-INSTALL_CLASSIC="${1:-false}"
-INSTALL_ONEAPI="${2:-false}"
-CLASSIC_VERSION="${3:-}"
-ONEAPI_VERSION="${4:-}"
+USE_CLASSIC=${1:?}
+USE_ONEAPI=${2:?}
+CLASSIC_VERSION=${3:?}
+ONEAPI_VERSION=${4:?}
 
 # Determine appropriate GCC version based on Intel compiler version
 # Intel 2023.x series supports GCC up to 12.x
@@ -33,80 +33,56 @@ determine_gcc_version() {
   fi
 }
 
-# Find the installed compiler directories
-ONEAPI_ROOT="/opt/intel/oneapi/compiler"
+GCC_VERSION_CLASSIC=$(determine_gcc_version $CLASSIC_VERSION)
+GCC_VERSION_ONEAPI=$(determine_gcc_version $ONEAPI_VERSION)
 
-if [ "$INSTALL_CLASSIC" = "true" ] || [ "$INSTALL_ONEAPI" = "true" ]; then
-  # Determine GCC version to use
-  if [ "$INSTALL_ONEAPI" = "true" ]; then
-    GCC_VERSION=$(determine_gcc_version "$ONEAPI_VERSION")
-  else
-    GCC_VERSION=$(determine_gcc_version "$CLASSIC_VERSION")
+# Check if the GCC version is available, install if needed
+if ! command -v gcc-${GCC_VERSION} &> /dev/null; then
+  echo "Installing GCC ${GCC_VERSION}..."
+  sudo apt-get update
+  if [ $USE_CLASSIC ]; then
+    sudo apt-get install -y gcc-${GCC_VERSION_CLASSIC} g++-${GCC_VERSION_CLASSIC} gfortran-${GCC_VERSION_CLASSIC}
   fi
-  
-  echo "Configuring Intel compilers to use GCC-${GCC_VERSION}"
-  
-  # Check if the GCC version is available, install if needed
-  if ! command -v gcc-${GCC_VERSION} &> /dev/null; then
-    echo "Installing GCC-${GCC_VERSION}..."
-    sudo apt-get update
-    sudo apt-get install -y gcc-${GCC_VERSION} g++-${GCC_VERSION} gfortran-${GCC_VERSION}
+  if [ $USE_ONEAPI ]; then
+    sudo apt-get install -y gcc-${GCC_VERSION_ONEAPI} g++-${GCC_VERSION_ONEAPI} gfortran-${GCC_VERSION_ONEAPI}
   fi
-  
-  # Find the actual compiler installation paths
-  if [ -d "$ONEAPI_ROOT" ]; then
-    for version_dir in $(find $ONEAPI_ROOT -maxdepth 1 -type d -name "20*" 2>/dev/null); do
-      echo "Configuring compilers in $version_dir"
-      
-      # Configure oneAPI compilers (icx, icpx, ifx)
-      if [ "$INSTALL_ONEAPI" = "true" ]; then
-        if [ -d "$version_dir/bin" ]; then
-          # Create/update icx.cfg
-          if [ -f "$version_dir/bin/icx" ]; then
-            echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}" | sudo tee "$version_dir/bin/icx.cfg" > /dev/null
-            echo "  Created icx.cfg with GCC ${GCC_VERSION}"
-          fi
-          
-          # Create/update icpx.cfg
-          if [ -f "$version_dir/bin/icpx" ]; then
-            echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}" | sudo tee "$version_dir/bin/icpx.cfg" > /dev/null
-            echo "  Created icpx.cfg with GCC ${GCC_VERSION}"
-          fi
-          
-          # Create/update ifx.cfg
-          if [ -f "$version_dir/bin/ifx" ]; then
-            echo "-gcc-name=gcc-${GCC_VERSION}" | sudo tee "$version_dir/bin/ifx.cfg" > /dev/null
-            echo "  Created ifx.cfg with GCC ${GCC_VERSION}"
-          fi
-        fi
-      fi
-      
-      # Configure Classic compilers (icc, icpc, ifort) - use -gcc-name flag
-      if [ "$INSTALL_CLASSIC" = "true" ]; then
-        if [ -d "$version_dir/bin/intel64" ]; then
-          # Create/update icc.cfg
-          if [ -f "$version_dir/bin/intel64/icc" ]; then
-            echo "-gcc-name=gcc-${GCC_VERSION}" | sudo tee "$version_dir/bin/intel64/icc.cfg" > /dev/null
-            echo "  Created icc.cfg with GCC-${GCC_VERSION}"
-          fi
-          
-          # Create/update icpc.cfg
-          if [ -f "$version_dir/bin/intel64/icpc" ]; then
-            echo "-gxx-name=g++-${GCC_VERSION}" | sudo tee "$version_dir/bin/intel64/icpc.cfg" > /dev/null
-            echo "  Created icpc.cfg with G++-${GCC_VERSION}"
-          fi
-          
-          # Create/update ifort.cfg - also needs gcc specification for linking
-          if [ -f "$version_dir/bin/intel64/ifort" ]; then
-            echo "-gcc-name=gcc-${GCC_VERSION}" | sudo tee "$version_dir/bin/intel64/ifort.cfg" > /dev/null
-            echo "  Created ifort.cfg with GCC-${GCC_VERSION}"
-          fi
-        fi
-      fi
-    done
-  fi
-  
-  echo "Intel compiler GCC configuration complete"
-else
-  echo "No Intel compilers to configure"
+fi
+
+# Find the actual compiler installation paths
+echo "Configuring compilers in $version_dir"
+
+if [ $USE_CLASSIC == true ]; then
+  # Create/update icc.cfg
+  icc_cfg_path=$(which icc).cfg
+  echo "  Modifying icc.cfg with GCC ${GCC_VERSION_CLASSIC}:"
+  echo "-gcc-name=gcc-${GCC_VERSION_CLASSIC}" | sudo tee $icc_cfg_path
+
+  # Create/update icpc.cfg
+  icpc_cfg_path=$(which icpc).cfg
+  echo "  Modifying icpc.cfg with GCC ${GCC_VERSION_CLASSIC}:"
+  echo "-gcc-name=gcc-${GCC_VERSION_CLASSIC} -gxx-name=g++-${GCC_VERSION_CLASSIC}" | sudo tee $icpc_cfg_path
+
+  # Create/update ifort.cfg - also needs gcc specification for linking
+  ifort_cfg_path=$(which ifort).cfg
+  echo "  Modifying ifort.cfg with GCC ${GCC_VERSION_CLASSIC}:"
+  echo "-gcc-name=gcc-${GCC_VERSION_CLASSIC}" | sudo tee $ifort_cfg_path
+
+  echo "Intel compiler GCC configuration complete ($0)"
+fi
+
+if [ $USE_ONEAPI == true ]; then
+  # Create/update icx.cfg
+  icx_cfg_path=$(which icx).cfg
+  echo "  Modifying icx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
+  echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION_ONEAPI}" | sudo tee $icx_cfg_path
+
+  # Create/update icpx.cfg
+  icpx_cfg_path=$(which icpx).cfg
+  echo "  Modifying icpx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
+  echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION_ONEAPI}" | sudo tee $icpx_cfg_path
+
+  # Create/update ifx.cfg
+  ifx_config_path=$(which ifx).cfg
+  echo "  Modifying ifx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
+  echo "-gcc-name=gcc-${GCC_VERSION_ONEAPI}" | sudo tee $ifx_config_path
 fi

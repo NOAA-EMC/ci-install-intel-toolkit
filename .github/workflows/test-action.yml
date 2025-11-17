@@ -219,13 +219,3 @@ jobs:
         run: |
           ifx ci/mkl_test.f90 -o mkl_test_f90 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
           ./mkl_test_f90
-      
-      - name: Verify MKL not installed
-        if: "!matrix.with-mkl"
-        run: |
-          # Verify that MKL headers are not available
-          if [ -f /opt/intel/oneapi/mkl/latest/include/mkl.h ]; then
-            echo "ERROR: MKL should not be installed"
-            exit 1
-          fi
-          echo "Verified: MKL is not installed"

@@ -237,11 +237,11 @@ jobs:
           icx ci/mkl_test.c -o mkl_test_c -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
           output=$(./mkl_test_c)
           echo "$output"
-          echo "$output" | grep -q "MKL BLAS test successful"
+          echo "$output" | grep -q "MKL BLAS test call successful"
       
       - name: Test MKL with Fortran
         run: |
           ifx ci/mkl_test.f90 -o mkl_test_f90 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
           output=$(./mkl_test_f90)
           echo "$output"
-          echo "$output" | grep -q "MKL BLAS Fortran test successful"
+          echo "$output" | grep -q "MKL BLAS Fortran test call successful"

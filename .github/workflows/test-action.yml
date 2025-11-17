@@ -37,17 +37,17 @@ jobs:
       
       - name: Test Classic C compilation
         run: |
-          icc ci/hello.c -o test_c
+          icc -v ci/hello.c -o test_c
           ./test_c
       
       - name: Test Classic C++ compilation
         run: |
-          icpc ci/hello.cpp -o test_cpp
+          icpc -v ci/hello.cpp -o test_cpp
           ./test_cpp
       
       - name: Test Classic Fortran compilation
         run: |
-          ifort ci/hello.f90 -o test_f90
+          ifort -v ci/hello.f90 -o test_f90
           ./test_f90
 
   test-oneapi-versions:
@@ -80,17 +80,17 @@ jobs:
       
       - name: Test oneAPI C compilation
         run: |
-          icx ci/hello.c -o test_c
+          icx -v ci/hello.c -o test_c
           ./test_c
       
       - name: Test oneAPI C++ compilation
         run: |
-          icpx ci/hello.cpp -o test_cpp
+          icpx -v ci/hello.cpp -o test_cpp
           ./test_cpp
       
       - name: Test oneAPI Fortran compilation
         run: |
-          ifx ci/hello.f90 -o test_f90
+          ifx -v ci/hello.f90 -o test_f90
           ./test_f90
 
   test-mpi-configurations:

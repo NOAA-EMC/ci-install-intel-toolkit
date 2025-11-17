@@ -140,6 +140,7 @@ jobs:
           mpi-wrapper-setup: ${{ matrix.mpi-wrapper }}
           compiler-setup: ${{ matrix.compiler-type }}
           env-update: true
+          cache: false
       
       - name: Verify MPI installation
         run: bash ci/verify-mpi.sh ${{ matrix.compiler-type }}
@@ -186,6 +187,7 @@ jobs:
           openmp-version: '2023.2.1'
           compiler-setup: 'oneapi'
           env-update: true
+          cache: false
       
       - name: Test OpenMP C compilation
         run: |
@@ -231,6 +233,7 @@ jobs:
           mkl-version: '2025.3'
           compiler-setup: 'oneapi'
           env-update: true
+          cache: false
       
       - name: Test MKL with C
         run: |

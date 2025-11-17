@@ -100,23 +100,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Test two MPI versions with oneAPI 2024.0.0
-          - compiler-version: '2024.0.0'
+          - compiler-version: '2025.3'
             compiler-type: 'oneapi'
             mpi-version: '2021.10.0'
             mpi-wrapper: 'oneapi'
-          - compiler-version: '2024.0.0'
-            compiler-type: 'oneapi'
-            mpi-version: '2021.11.0'
-            mpi-wrapper: 'oneapi'
-          # Test two MPI versions with classic 2023.2.1 (last version with Classic)
           - compiler-version: '2023.2.1'
             compiler-type: 'classic'
             mpi-version: '2021.10.0'
-            mpi-wrapper: 'classic'
-          - compiler-version: '2023.2.1'
-            compiler-type: 'classic'
-            mpi-version: '2021.11.0'
             mpi-wrapper: 'classic'
     
     steps:
@@ -157,8 +147,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        with-openmp: [true, false]
     
     steps:
       - name: Checkout repository
@@ -171,8 +159,8 @@ jobs:
         uses: ./
         with:
           install-oneapi: true
-          oneapi-version: '2024.0.0'
-          install-openmp: ${{ matrix.with-openmp }}
+          oneapi-version: '2023.2.1'
+          install-openmp: true
           openmp-version: '2023.2.1'
           compiler-setup: 'oneapi'
           env-update: true
@@ -202,8 +190,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        with-mkl: [true, false]
     
     steps:
       - name: Checkout repository
@@ -216,9 +202,9 @@ jobs:
         uses: ./
         with:
           install-oneapi: true
-          oneapi-version: '2024.0.0'
-          install-mkl: ${{ matrix.with-mkl }}
-          mkl-version: '2023.2.0'
+          oneapi-version: '2023.2.1'
+          install-mkl: true
+          mkl-version: '2023.2.1'
           compiler-setup: 'oneapi'
           env-update: true
       

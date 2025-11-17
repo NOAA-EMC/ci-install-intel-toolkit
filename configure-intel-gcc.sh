@@ -64,12 +64,12 @@ if [ $USE_ONEAPI == true ]; then
   # Create/update icx.cfg
   icx_cfg_path=$(which icx).cfg
   echo "  Modifying icx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
-  echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION_ONEAPI}" | sudo tee $icx_cfg_path
+  echo "--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION_ONEAPI}" | sudo tee $icx_cfg_path
 
   # Create/update icpx.cfg
   icpx_cfg_path=$(which icpx).cfg
   echo "  Modifying icpx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
-  echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION_ONEAPI}" | sudo tee $icpx_cfg_path
+  echo "--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION_ONEAPI}" | sudo tee $icpx_cfg_path
 
   # Create/update ifx.cfg
   ifx_config_path=$(which ifx).cfg

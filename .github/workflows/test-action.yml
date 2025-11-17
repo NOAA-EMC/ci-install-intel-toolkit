@@ -33,6 +33,9 @@ jobs:
       - name: Verify Classic compilers
         run: bash ci/verify-classic-compilers.sh
       
+      - name: Verify GCC configuration
+        run: bash ci/verify-gcc-config.sh
+      
       - name: Test Classic C compilation
         run: |
           icc ci/hello.c -o test_c
@@ -74,6 +77,9 @@ jobs:
       
       - name: Verify oneAPI compilers
         run: bash ci/verify-oneapi-compilers.sh
+      
+      - name: Verify GCC configuration
+        run: bash ci/verify-gcc-config.sh
       
       - name: Test oneAPI C compilation
         run: |
@@ -120,6 +126,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
+      - name: Verify no Intel compilers pre-installed
+        run: bash ci/verify-no-intel-compilers.sh
+      
       - name: Install Intel compilers with MPI
         uses: ./
         with:
@@ -157,6 +166,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Verify no Intel compilers pre-installed
+        run: bash ci/verify-no-intel-compilers.sh
       
       - name: Install Intel compilers
         uses: ./
@@ -200,6 +212,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
+      - name: Verify no Intel compilers pre-installed
+        run: bash ci/verify-no-intel-compilers.sh
+      
       - name: Install Intel compilers
         uses: ./
         with:
@@ -239,6 +254,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Verify no Intel compilers pre-installed
+        run: bash ci/verify-no-intel-compilers.sh
       
       - name: Install Intel compilers (first run, should cache)
         uses: ./

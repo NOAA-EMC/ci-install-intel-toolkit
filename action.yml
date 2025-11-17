@@ -119,6 +119,15 @@ runs:
         echo "COMPONENTS: $COMPONENTS"
         sudo apt-get install --no-install-recommends --no-install-suggests $COMPONENTS
 
+    - name: "Configure Intel compilers to use appropriate GCC version"
+      if: ${{ steps.intel-cache.outputs.cache-hit != 'true' }}
+      shell: ${{ inputs.shell }}
+      run: |
+        bash ${{ github.action_path }}/configure-intel-gcc.sh \
+          "${{ inputs.install-classic }}" \
+          "${{ inputs.install-oneapi }}" \
+          "${{ inputs.classic-version }}" \
+          "${{ inputs.oneapi-version }}"
 
     - name: Always save Intel installation
       id: intel-cache-save

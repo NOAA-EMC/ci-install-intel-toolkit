@@ -1,0 +1,270 @@
+name: Test Intel Toolkit Action
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-compiler-versions:
+    name: Test Compiler v${{ matrix.version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['2023.2.1', '2024.0.0', '2024.1.0']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Intel Classic compilers
+        uses: ./
+        with:
+          install-classic: true
+          classic-version: ${{ matrix.version }}
+          install-oneapi: false
+          compiler-setup: 'classic'
+          env-update: true
+      
+      - name: Verify Classic compilers
+        run: bash ci/verify-classic-compilers.sh
+      
+      - name: Test Classic C compilation
+        run: |
+          icc ci/hello.c -o test_c
+          ./test_c
+      
+      - name: Test Classic C++ compilation
+        run: |
+          icpc ci/hello.cpp -o test_cpp
+          ./test_cpp
+      
+      - name: Test Classic Fortran compilation
+        run: |
+          ifort ci/hello.f90 -o test_f90
+          ./test_f90
+
+  test-oneapi-versions:
+    name: Test oneAPI v${{ matrix.version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['2023.2.1', '2024.0.0', '2024.1.0']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Intel oneAPI compilers
+        uses: ./
+        with:
+          install-classic: false
+          install-oneapi: true
+          oneapi-version: ${{ matrix.version }}
+          compiler-setup: 'oneapi'
+          env-update: true
+      
+      - name: Verify oneAPI compilers
+        run: bash ci/verify-oneapi-compilers.sh
+      
+      - name: Test oneAPI C compilation
+        run: |
+          icx ci/hello.c -o test_c
+          ./test_c
+      
+      - name: Test oneAPI C++ compilation
+        run: |
+          icpx ci/hello.cpp -o test_cpp
+          ./test_cpp
+      
+      - name: Test oneAPI Fortran compilation
+        run: |
+          ifx ci/hello.f90 -o test_f90
+          ./test_f90
+
+  test-mpi-configurations:
+    name: MPI ${{ matrix.mpi-version }} with ${{ matrix.compiler-type }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Test two MPI versions with oneAPI 2024.0.0
+          - compiler-version: '2024.0.0'
+            compiler-type: 'oneapi'
+            mpi-version: '2021.10.0'
+            mpi-wrapper: 'oneapi'
+          - compiler-version: '2024.0.0'
+            compiler-type: 'oneapi'
+            mpi-version: '2021.11.0'
+            mpi-wrapper: 'oneapi'
+          # Test two MPI versions with classic 2024.0.0
+          - compiler-version: '2024.0.0'
+            compiler-type: 'classic'
+            mpi-version: '2021.10.0'
+            mpi-wrapper: 'classic'
+          - compiler-version: '2024.0.0'
+            compiler-type: 'classic'
+            mpi-version: '2021.11.0'
+            mpi-wrapper: 'classic'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Intel compilers with MPI
+        uses: ./
+        with:
+          install-classic: ${{ matrix.compiler-type == 'classic' }}
+          classic-version: ${{ matrix.compiler-version }}
+          install-oneapi: ${{ matrix.compiler-type == 'oneapi' }}
+          oneapi-version: ${{ matrix.compiler-version }}
+          install-mpi: true
+          mpi-version: ${{ matrix.mpi-version }}
+          mpi-wrapper-setup: ${{ matrix.mpi-wrapper }}
+          compiler-setup: ${{ matrix.compiler-type }}
+          env-update: true
+      
+      - name: Verify MPI installation
+        run: bash ci/verify-mpi.sh ${{ matrix.compiler-type }}
+      
+      - name: Test MPI C compilation and execution
+        run: |
+          $CC ci/mpi_hello.c -o mpi_test_c
+          mpirun -n 2 ./mpi_test_c
+      
+      - name: Test MPI Fortran compilation and execution
+        run: |
+          $FC ci/mpi_hello.f90 -o mpi_test_f90
+          mpirun -n 2 ./mpi_test_f90
+
+  test-openmp:
+    name: OpenMP ${{ matrix.with-openmp && 'enabled' || 'disabled' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        with-openmp: [true, false]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Intel compilers
+        uses: ./
+        with:
+          install-oneapi: true
+          oneapi-version: '2024.0.0'
+          install-openmp: ${{ matrix.with-openmp }}
+          openmp-version: '2023.2.1'
+          compiler-setup: 'oneapi'
+          env-update: true
+      
+      - name: Test OpenMP C compilation
+        if: matrix.with-openmp
+        run: |
+          icx -qopenmp ci/openmp_test.c -o openmp_test_c
+          export OMP_NUM_THREADS=4
+          ./openmp_test_c
+      
+      - name: Test OpenMP Fortran compilation
+        if: matrix.with-openmp
+        run: |
+          ifx -qopenmp ci/openmp_test.f90 -o openmp_test_f90
+          export OMP_NUM_THREADS=4
+          ./openmp_test_f90
+      
+      - name: Verify OpenMP not installed
+        if: "!matrix.with-openmp"
+        run: |
+          icx ci/hello.c -o test_c
+          ./test_c
+
+  test-mkl:
+    name: MKL ${{ matrix.with-mkl && 'enabled' || 'disabled' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        with-mkl: [true, false]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Intel compilers
+        uses: ./
+        with:
+          install-oneapi: true
+          oneapi-version: '2024.0.0'
+          install-mkl: ${{ matrix.with-mkl }}
+          mkl-version: '2023.2.0'
+          compiler-setup: 'oneapi'
+          env-update: true
+      
+      - name: Test MKL with C
+        if: matrix.with-mkl
+        run: |
+          icx ci/mkl_test.c -o mkl_test_c -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
+          ./mkl_test_c
+      
+      - name: Test MKL with Fortran
+        if: matrix.with-mkl
+        run: |
+          ifx ci/mkl_test.f90 -o mkl_test_f90 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl
+          ./mkl_test_f90
+      
+      - name: Verify MKL not installed
+        if: "!matrix.with-mkl"
+        run: |
+          # Verify that MKL headers are not available
+          if [ -f /opt/intel/oneapi/mkl/latest/include/mkl.h ]; then
+            echo "ERROR: MKL should not be installed"
+            exit 1
+          fi
+          echo "Verified: MKL is not installed"
+
+  test-cache:
+    name: Test caching
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Intel compilers (first run, should cache)
+        uses: ./
+        with:
+          install-oneapi: true
+          oneapi-version: '2024.0.0'
+          compiler-setup: 'oneapi'
+          cache: true
+          env-update: true
+      
+      - name: Verify compilers work
+        run: |
+          icx --version
+          icpx --version
+          ifx --version
+      
+      - name: Clear installation directory
+        run: |
+          sudo rm -rf /opt/intel
+      
+      - name: Install Intel compilers (second run, should use cache)
+        uses: ./
+        with:
+          install-oneapi: true
+          oneapi-version: '2024.0.0'
+          compiler-setup: 'oneapi'
+          cache: true
+          env-update: true
+      
+      - name: Verify compilers still work (from cache)
+        run: |
+          icx --version
+          icpx --version
+          ifx --version
+          echo "Cache test passed!"

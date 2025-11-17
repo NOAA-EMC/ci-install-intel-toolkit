@@ -3,7 +3,7 @@
 # This script creates .cfg files for Intel compilers to ensure they use
 # a compatible GCC version based on the Intel compiler version installed.
 
-set -ex
+set -e
 
 USE_CLASSIC=${1:?}
 USE_ONEAPI=${2:?}
@@ -37,15 +37,16 @@ GCC_VERSION_CLASSIC=$(determine_gcc_version $CLASSIC_VERSION)
 GCC_VERSION_ONEAPI=$(determine_gcc_version $ONEAPI_VERSION)
 
 # Check if the GCC version is available, install if needed
-#echo "Installing GCC ..."
-#sudo apt-get update
-#if [ $USE_CLASSIC ]; then
-#  sudo apt-get install -y gcc-${GCC_VERSION_CLASSIC} g++-${GCC_VERSION_CLASSIC} gfortran-${GCC_VERSION_CLASSIC}
-#fi
-#if [ $USE_ONEAPI ]; then
-#  sudo apt-get install -y gcc-${GCC_VERSION_ONEAPI} g++-${GCC_VERSION_ONEAPI} gfortran-${GCC_VERSION_ONEAPI}
-#fi
+echo "Installing GCC ..."
+sudo apt-get update
+if [ $USE_CLASSIC ]; then
+  sudo apt-get install -y gcc-${GCC_VERSION_CLASSIC} g++-${GCC_VERSION_CLASSIC} gfortran-${GCC_VERSION_CLASSIC}
+fi
+if [ $USE_ONEAPI ]; then
+  sudo apt-get install -y gcc-${GCC_VERSION_ONEAPI} g++-${GCC_VERSION_ONEAPI} gfortran-${GCC_VERSION_ONEAPI}
+fi
 
+if [ $USE_CLASSIC == true ]; then
   # Create/update icc.cfg
   icc_cfg_path=$(which icc).cfg
   echo "  Modifying icc.cfg with GCC ${GCC_VERSION_CLASSIC}:"
@@ -62,7 +63,9 @@ GCC_VERSION_ONEAPI=$(determine_gcc_version $ONEAPI_VERSION)
   echo "-gcc-name=gcc-${GCC_VERSION_CLASSIC}" | sudo tee $ifort_cfg_path
 
   echo "Intel compiler GCC configuration complete ($0)"
+fi
 
+if [ $USE_ONEAPI == true ]; then
   # Create/update icx.cfg
   icx_cfg_path=$(which icx).cfg
   echo "  Modifying icx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
@@ -77,3 +80,4 @@ GCC_VERSION_ONEAPI=$(determine_gcc_version $ONEAPI_VERSION)
   ifx_config_path=$(which ifx).cfg
   echo "  Modifying ifx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
   echo "-gcc-name=gcc-${GCC_VERSION_ONEAPI}" | sudo tee $ifx_config_path
+fi

@@ -46,7 +46,6 @@ if [ $USE_ONEAPI ]; then
   sudo apt-get install -y gcc-${GCC_VERSION_ONEAPI} g++-${GCC_VERSION_ONEAPI} gfortran-${GCC_VERSION_ONEAPI}
 fi
 
-if [ $USE_CLASSIC == true ]; then
   # Create/update icc.cfg
   icc_cfg_path=$(which icc).cfg
   echo "  Modifying icc.cfg with GCC ${GCC_VERSION_CLASSIC}:"
@@ -63,9 +62,7 @@ if [ $USE_CLASSIC == true ]; then
   echo "-gcc-name=gcc-${GCC_VERSION_CLASSIC}" | sudo tee $ifort_cfg_path
 
   echo "Intel compiler GCC configuration complete ($0)"
-fi
 
-if [ $USE_ONEAPI == true ]; then
   # Create/update icx.cfg
   icx_cfg_path=$(which icx).cfg
   echo "  Modifying icx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
@@ -80,4 +77,3 @@ if [ $USE_ONEAPI == true ]; then
   ifx_config_path=$(which ifx).cfg
   echo "  Modifying ifx.cfg to use GCC ${GCC_VERSION_ONEAPI}:"
   echo "-gcc-name=gcc-${GCC_VERSION_ONEAPI}" | sudo tee $ifx_config_path
-fi

@@ -166,7 +166,7 @@ jobs:
           [ "$rank1_count" -eq 1 ] || { echo "ERROR: Rank 1 output appeared $rank1_count times (expected 1)"; exit 1; }
 
   test-openmp:
-    name: OpenMP ${{ matrix.with-openmp && 'enabled' || 'disabled' }}
+    name: OpenMP
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

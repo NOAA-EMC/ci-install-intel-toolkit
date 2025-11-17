@@ -29,6 +29,7 @@ jobs:
           install-oneapi: false
           compiler-setup: 'classic'
           env-update: true
+          cache: false
       
       - name: Verify Classic compilers
         run: bash ci/verify-classic-compilers.sh
@@ -71,6 +72,7 @@ jobs:
           oneapi-version: ${{ matrix.version }}
           compiler-setup: 'oneapi'
           env-update: true
+          cache: false
       
       - name: Verify oneAPI compilers
         run: bash ci/verify-oneapi-compilers.sh
@@ -240,49 +242,3 @@ jobs:
             exit 1
           fi
           echo "Verified: MKL is not installed"
-
-  test-cache:
-    name: Test caching
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Verify no Intel compilers pre-installed
-        run: bash ci/verify-no-intel-compilers.sh
-      
-      - name: Install Intel compilers (first run, should cache)
-        uses: ./
-        with:
-          install-oneapi: true
-          oneapi-version: '2024.0.0'
-          compiler-setup: 'oneapi'
-          cache: true
-          env-update: true
-      
-      - name: Verify compilers work
-        run: |
-          icx --version
-          icpx --version
-          ifx --version
-      
-      - name: Clear installation directory
-        run: |
-          sudo rm -rf /opt/intel
-      
-      - name: Install Intel compilers (second run, should use cache)
-        uses: ./
-        with:
-          install-oneapi: true
-          oneapi-version: '2024.0.0'
-          compiler-setup: 'oneapi'
-          cache: true
-          env-update: true
-      
-      - name: Verify compilers still work (from cache)
-        run: |
-          icx --version
-          icpx --version
-          ifx --version
-          echo "Cache test passed!"

@@ -10,28 +10,9 @@ INSTALL_ONEAPI="${2:-false}"
 CLASSIC_VERSION="${3:-}"
 ONEAPI_VERSION="${4:-}"
 
-# Determine appropriate GCC version based on Intel compiler version
-# Intel 2023.x series supports GCC up to 12.x
-# Intel 2024.0.x supports GCC up to 13.x
-# Intel 2024.1+ supports GCC up to 14.x
-determine_gcc_version() {
-  local intel_version=$1
-  local major=$(echo $intel_version | cut -d. -f1)
-  local minor=$(echo $intel_version | cut -d. -f2)
-  
-  if [ "$major" = "2023" ]; then
-    echo "12"
-  elif [ "$major" = "2024" ]; then
-    if [ "$minor" = "0" ]; then
-      echo "13"
-    else
-      echo "14"
-    fi
-  else
-    # Default to GCC 13 for unknown versions
-    echo "13"
-  fi
-}
+# Source the shared GCC version mapping function
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/intel-gcc-version-map.sh"
 
 # Find the installed compiler directories
 ONEAPI_ROOT="/opt/intel/oneapi/compiler"
@@ -63,23 +44,20 @@ if [ "$INSTALL_CLASSIC" = "true" ] || [ "$INSTALL_ONEAPI" = "true" ]; then
         if [ -d "$version_dir/bin" ]; then
           # Create/update icx.cfg
           if [ -f "$version_dir/bin/icx" ]; then
-            echo "--gcc-toolchain=/usr" | sudo tee "$version_dir/bin/icx.cfg" > /dev/null
-            echo "--gcc-name=gcc-${GCC_VERSION}" | sudo tee -a "$version_dir/bin/icx.cfg" > /dev/null
-            echo "  Created icx.cfg with GCC-${GCC_VERSION}"
+            echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}" | sudo tee "$version_dir/bin/icx.cfg" > /dev/null
+            echo "  Created icx.cfg with GCC ${GCC_VERSION}"
           fi
           
           # Create/update icpx.cfg
           if [ -f "$version_dir/bin/icpx" ]; then
-            echo "--gcc-toolchain=/usr" | sudo tee "$version_dir/bin/icpx.cfg" > /dev/null
-            echo "--gcc-name=g++-${GCC_VERSION}" | sudo tee -a "$version_dir/bin/icpx.cfg" > /dev/null
-            echo "  Created icpx.cfg with G++-${GCC_VERSION}"
+            echo "--gcc-toolchain=/usr/lib/gcc/x86_64-linux-gnu/${GCC_VERSION}" | sudo tee "$version_dir/bin/icpx.cfg" > /dev/null
+            echo "  Created icpx.cfg with GCC ${GCC_VERSION}"
           fi
           
           # Create/update ifx.cfg
           if [ -f "$version_dir/bin/ifx" ]; then
-            echo "--gcc-toolchain=/usr" | sudo tee "$version_dir/bin/ifx.cfg" > /dev/null
-            echo "--gcc-name=gcc-${GCC_VERSION}" | sudo tee -a "$version_dir/bin/ifx.cfg" > /dev/null
-            echo "  Created ifx.cfg with GCC-${GCC_VERSION}"
+            echo "-gcc-name=gcc-${GCC_VERSION}" | sudo tee "$version_dir/bin/ifx.cfg" > /dev/null
+            echo "  Created ifx.cfg with GCC ${GCC_VERSION}"
           fi
         fi
       fi

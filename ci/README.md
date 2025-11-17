@@ -8,7 +8,6 @@ This directory contains helper scripts and test source code used by the GitHub A
 - **verify-classic-compilers.sh** - Verifies Intel Classic compilers (icc, icpc, ifort) are installed and environment variables are set correctly
 - **verify-oneapi-compilers.sh** - Verifies Intel oneAPI compilers (icx, icpx, ifx) are installed and environment variables are set correctly
 - **verify-mpi.sh** - Verifies Intel MPI is installed and wrappers are configured correctly (takes `oneapi` or `classic` as argument)
-- **verify-gcc-config.sh** - Verifies Intel compilers have GCC configuration files (.cfg) and displays their contents
 
 ## Test Source Files
 

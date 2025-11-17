@@ -186,7 +186,7 @@ jobs:
           ./test_c
 
   test-mkl:
-    name: MKL ${{ matrix.with-mkl && 'enabled' || 'disabled' }}
+    name: MKL
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -202,9 +202,9 @@ jobs:
         uses: ./
         with:
           install-oneapi: true
-          oneapi-version: '2023.2.1'
+          oneapi-version: '2025.3'
           install-mkl: true
-          mkl-version: '2023.2.1'
+          mkl-version: '2025.3'
           compiler-setup: 'oneapi'
           env-update: true
       

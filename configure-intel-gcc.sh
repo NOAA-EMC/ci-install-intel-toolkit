@@ -37,19 +37,14 @@ GCC_VERSION_CLASSIC=$(determine_gcc_version $CLASSIC_VERSION)
 GCC_VERSION_ONEAPI=$(determine_gcc_version $ONEAPI_VERSION)
 
 # Check if the GCC version is available, install if needed
-if ! command -v gcc-${GCC_VERSION} &> /dev/null; then
-  echo "Installing GCC ${GCC_VERSION}..."
-  sudo apt-get update
-  if [ $USE_CLASSIC ]; then
-    sudo apt-get install -y gcc-${GCC_VERSION_CLASSIC} g++-${GCC_VERSION_CLASSIC} gfortran-${GCC_VERSION_CLASSIC}
-  fi
-  if [ $USE_ONEAPI ]; then
-    sudo apt-get install -y gcc-${GCC_VERSION_ONEAPI} g++-${GCC_VERSION_ONEAPI} gfortran-${GCC_VERSION_ONEAPI}
-  fi
+echo "Installing GCC ..."
+sudo apt-get update
+if [ $USE_CLASSIC ]; then
+  sudo apt-get install -y gcc-${GCC_VERSION_CLASSIC} g++-${GCC_VERSION_CLASSIC} gfortran-${GCC_VERSION_CLASSIC}
 fi
-
-# Find the actual compiler installation paths
-echo "Configuring compilers in $version_dir"
+if [ $USE_ONEAPI ]; then
+  sudo apt-get install -y gcc-${GCC_VERSION_ONEAPI} g++-${GCC_VERSION_ONEAPI} gfortran-${GCC_VERSION_ONEAPI}
+fi
 
 if [ $USE_CLASSIC == true ]; then
   # Create/update icc.cfg

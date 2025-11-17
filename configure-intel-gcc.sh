@@ -1,7 +1,7 @@
 #!/bin/bash
 # Configure Intel compilers to use appropriate GCC version
-# This script creates .cfg files for Intel compilers to ensure they use
-# a compatible GCC version based on the Intel compiler version installed.
+# This script populates the .cfg files for Intel compilers to ensure they use
+# a compatible GCC version based on the Intel compiler version requested.
 
 set -e
 

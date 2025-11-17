@@ -6,13 +6,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-compiler-versions:
-    name: Test Compiler v${{ matrix.version }}
+  test-classic-compilers:
+    name: Test Classic v${{ matrix.version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        version: ['2023.2.1', '2024.0', '2025.3']
+        # Classic compilers only available in 2023.x
+        version: ['2023.2.1']
     
     steps:
       - name: Checkout repository
@@ -55,7 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ['2023.2.1', '2024.0.0', '2024.1.0']
+        version: ['2023.2.1', '2025.3']
     
     steps:
       - name: Checkout repository
@@ -108,12 +109,12 @@ jobs:
             compiler-type: 'oneapi'
             mpi-version: '2021.11.0'
             mpi-wrapper: 'oneapi'
-          # Test two MPI versions with classic 2024.0.0
-          - compiler-version: '2024.0.0'
+          # Test two MPI versions with classic 2023.2.1 (last version with Classic)
+          - compiler-version: '2023.2.1'
             compiler-type: 'classic'
             mpi-version: '2021.10.0'
             mpi-wrapper: 'classic'
-          - compiler-version: '2024.0.0'
+          - compiler-version: '2023.2.1'
             compiler-type: 'classic'
             mpi-version: '2021.11.0'
             mpi-wrapper: 'classic'

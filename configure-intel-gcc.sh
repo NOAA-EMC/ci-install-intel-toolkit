@@ -3,7 +3,7 @@
 # This script creates .cfg files for Intel compilers to ensure they use
 # a compatible GCC version based on the Intel compiler version installed.
 
-set -e
+set -ex
 
 USE_CLASSIC=${1:?}
 USE_ONEAPI=${2:?}

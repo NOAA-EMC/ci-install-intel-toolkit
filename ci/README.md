@@ -27,10 +27,3 @@ This directory contains helper scripts and test source code used by the GitHub A
 ### MKL Tests
 - **mkl_test.c** - MKL C program that performs BLAS dgemm operation
 - **mkl_test.f90** - MKL Fortran program that performs BLAS dgemm operation
-
-### Combined Tests
-- **combined_test.c** - Program combining MPI, OpenMP, and MKL features
-
-## Usage
-
-These files are automatically used by the GitHub Actions workflow. They help keep the workflow YAML file clean and maintainable by separating test logic and source code from workflow configuration.

@@ -16,6 +16,5 @@ program mkl_test
     ! C = A * B
     call dgemm('N', 'N', 2, 2, 3, 1.0d0, a, 2, b, 3, 0.0d0, c, 2)
     
-    print *, 'MKL BLAS Fortran test successful'
-    print *, 'Result:', c
+    print *, 'MKL BLAS Fortran test call successful'
 end program mkl_test

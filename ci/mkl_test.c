@@ -10,8 +10,7 @@ int main() {
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                2, 2, 3, 1.0, a, 3, b, 2, 0.0, c, 2);
     
-    printf("MKL BLAS test successful\n");
-    printf("Result: %f %f %f %f\n", c[0], c[1], c[2], c[3]);
+    printf("MKL BLAS test call successful\n");
     
     return 0;
 }

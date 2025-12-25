@@ -156,9 +156,11 @@ runs:
         if [ "${{ inputs.mpi-wrapper-setup }}" == "oneapi" ]; then
           echo -e "CC=mpiicx\nCXX=mpiicpx\nFC=mpiifx" >> $GITHUB_ENV
           echo -e "I_MPI_CC=icx\nI_MPI_CXX=icpx\nI_MPI_FC=ifx\nI_MPI_F77=ifx" >> $GITHUB_ENV
+          . /opt/intel/oneapi/mpi/${{ inputs.mpi-version }}/env/vars.sh
         elif [ "${{ inputs.mpi-wrapper-setup }}" == "classic" ]; then
           echo -e "CC=mpiicc\nCXX=mpiicpc\nFC=mpiifort" >> $GITHUB_ENV
           echo -e "I_MPI_CC=icc\nI_MPI_CXX=icpc\nI_MPI_FC=ifort\nI_MPI_F77=ifort" >> $GITHUB_ENV
+          . /opt/intel/oneapi/mpi/${{ inputs.mpi-version }}/env/vars.sh
         fi
         if [ "${{ inputs.install-mkl }}" == true ]; then
           . /opt/intel/oneapi/mkl/${{ inputs.mkl-version }}/env/vars.sh

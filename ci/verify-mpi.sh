@@ -10,7 +10,7 @@ echo "=== Checking MPI Installation (${COMPILER_TYPE}) ==="
 
 if [ "$COMPILER_TYPE" = "oneapi" ]; then
     for compiler in mpiicx mpiicpx mpiifx; do
-        which $compiler || { echo "ERROR: $compiler not found }
+        which $compiler || { echo "ERROR: $compiler not found" }
     done
     mpiicx --version
     echo "CC: $CC , should be mpiicx"
@@ -21,7 +21,7 @@ if [ "$COMPILER_TYPE" = "oneapi" ]; then
     test "$FC" = "mpiifx" || { echo "ERROR: FC should be mpiifx but is $FC"; exit 1; }
 else
     for compiler in mpiicc mpiicx mpiifort; do
-        which $compiler || { echo "ERROR: $compiler not found }
+        which $compiler || { echo "ERROR: $compiler not found" }
     done
     mpiicc --version
     echo "CC: $CC , should be mpiicc"

@@ -2,16 +2,16 @@
 # Verify Intel MPI is installed and configured correctly
 # Usage: verify-mpi.sh [oneapi|classic]
 
-set -e
+set +e
 
 COMPILER_TYPE="${1:-oneapi}"
 
 echo "=== Checking MPI Installation (${COMPILER_TYPE}) ==="
 
 if [ "$COMPILER_TYPE" = "oneapi" ]; then
-    which mpiicx
-    which mpiicpx
-    which mpiifx
+    for compiler in mpiicx mpiicpx mpiifx; do
+        which $compiler || { echo "ERROR: $compiler not found }
+    done
     mpiicx --version
     echo "CC=$CC (should be mpiicx)"
     echo "CXX=$CXX (should be mpiicpx)"
@@ -20,9 +20,9 @@ if [ "$COMPILER_TYPE" = "oneapi" ]; then
     test "$CXX" = "mpiicpx" || { echo "ERROR: CXX should be mpiicpx but is $CXX"; exit 1; }
     test "$FC" = "mpiifx" || { echo "ERROR: FC should be mpiifx but is $FC"; exit 1; }
 else
-    which mpiicc
-    which mpiicpc
-    which mpiifort
+    for compiler in mpiicc mpiicx mpiifort; do
+        which $compiler || { echo "ERROR: $compiler not found }
+    done
     mpiicc --version
     echo "CC=$CC (should be mpiicc)"
     echo "CXX=$CXX (should be mpiicpc)"

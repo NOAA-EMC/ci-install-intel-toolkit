@@ -75,7 +75,7 @@ jobs:
       - name: Install Intel oneAPI compilers
         uses: ./
         with:
-          install-classic: false
+          install-classic: true
           install-oneapi: true
           oneapi-version: ${{ matrix.version }}
           compiler-setup: 'oneapi'

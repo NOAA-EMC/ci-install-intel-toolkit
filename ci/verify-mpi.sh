@@ -13,9 +13,9 @@ if [ "$COMPILER_TYPE" = "oneapi" ]; then
         which $compiler || { echo "ERROR: $compiler not found }
     done
     mpiicx --version
-    echo "CC=$CC (should be mpiicx)"
-    echo "CXX=$CXX (should be mpiicpx)"
-    echo "FC=$FC (should be mpiifx)"
+    echo "CC: $CC (should be mpiicx)"
+    echo "CXX: $CXX (should be mpiicpx)"
+    echo "FC: $FC (should be mpiifx)"
     test "$CC" = "mpiicx" || { echo "ERROR: CC should be mpiicx but is $CC"; exit 1; }
     test "$CXX" = "mpiicpx" || { echo "ERROR: CXX should be mpiicpx but is $CXX"; exit 1; }
     test "$FC" = "mpiifx" || { echo "ERROR: FC should be mpiifx but is $FC"; exit 1; }
@@ -24,9 +24,9 @@ else
         which $compiler || { echo "ERROR: $compiler not found }
     done
     mpiicc --version
-    echo "CC=$CC (should be mpiicc)"
-    echo "CXX=$CXX (should be mpiicpc)"
-    echo "FC=$FC (should be mpiifort)"
+    echo "CC: $CC (should be mpiicc)"
+    echo "CXX: $CXX (should be mpiicpc)"
+    echo "FC: $FC (should be mpiifort)"
     test "$CC" = "mpiicc" || { echo "ERROR: CC should be mpiicc but is $CC"; exit 1; }
     test "$CXX" = "mpiicpc" || { echo "ERROR: CXX should be mpiicpc but is $CXX"; exit 1; }
     test "$FC" = "mpiifort" || { echo "ERROR: FC should be mpiifort but is $FC"; exit 1; }

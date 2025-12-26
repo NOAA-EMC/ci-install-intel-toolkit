@@ -16,7 +16,7 @@ inputs:
     default: true
   oneapi-version:
     description: 'Set Intel oneAPI version'
-    default: '2023.2.1'
+    default: '2025.3'
   install-mpi:
     description: 'Install Intel MPI libraries'
     default: false

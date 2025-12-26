@@ -146,10 +146,10 @@ runs:
         # Inject environment changes into $GITHUB_ENV
         echo 'Updating $GITHUB_ENV'
         bash -c "env > /tmp/before.txt"
-        if [ "${{ inputs.compiler-setup }}" == "oneapi" ]; then
+        if [[ "${{ inputs.compiler-setup }}" == "oneapi" || "${{ inputs.mpi-wrapper-setup }}" == "oneapi" ]]; then
           echo -e "CC=icx\nCXX=icpx\nFC=ifx" >> $GITHUB_ENV
           . /opt/intel/oneapi/compiler/${{ inputs.oneapi-version }}/env/vars.sh
-        elif [ "${{ inputs.compiler-setup }}" == "classic" ]; then
+        elif [[ "${{ inputs.compiler-setup }}" == "classic" || "${{ inputs.mpi-wrapper-setup }}" == "classic" ]]; then
           echo -e "CC=icc\nCXX=icpc\nFC=ifort" >> $GITHUB_ENV
           . /opt/intel/oneapi/compiler/${{ inputs.classic-version }}/env/vars.sh
         fi

@@ -140,7 +140,6 @@ jobs:
           install-mpi: true
           mpi-version: ${{ matrix.mpi-version }}
           mpi-wrapper-setup: ${{ matrix.mpi-wrapper }}
-          compiler-setup: ${{ matrix.compiler-type }}
           env-update: true
           cache: false
       

@@ -2,6 +2,7 @@ name: 'CI: Test ci-install-intel-toolkit action'
 
 on:
   push:
+    branches: [develop]
   pull_request:
   workflow_dispatch:
   schedule:
@@ -9,7 +10,7 @@ on:
 
 jobs:
   test-classic-compilers:
-    name: Test Classic v${{ matrix.version }}
+    name: Test Classic
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -26,6 +27,8 @@ jobs:
       
       - name: Install Intel Classic compilers
         uses: ./
+        env:
+          RUNNER_DEBUG: '1'
         with:
           install-classic: true
           classic-version: ${{ matrix.version }}
@@ -34,6 +37,9 @@ jobs:
           compiler-setup: 'classic'
           env-update: true
           cache: false
+      
+      - name: Verify debug output
+        uses: ./ci/verify-debug-output
       
       - name: Verify Classic compilers
         run: bash ci/verify-classic-compilers.sh
@@ -60,7 +66,7 @@ jobs:
           echo "$output" | grep -q "Hello from Intel Fortran compiler"
 
   test-oneapi-versions:
-    name: Test oneAPI v${{ matrix.version }}${{ matrix.fortran-compiler && format(' (FC={0})', matrix.fortran-compiler) || '' }}
+    name: Test oneAPI
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -82,6 +88,8 @@ jobs:
       
       - name: Install Intel oneAPI compilers
         uses: ./
+        env:
+          RUNNER_DEBUG: '1'
         with:
           install-classic: true
           install-oneapi: true
@@ -90,6 +98,9 @@ jobs:
           compiler-setup: 'oneapi'
           env-update: true
           cache: false
+      
+      - name: Verify debug output
+        uses: ./ci/verify-debug-output
       
       - name: Verify oneAPI compilers
         run: bash ci/verify-oneapi-compilers.sh ${{ matrix.fortran-compiler }}

@@ -56,7 +56,7 @@ inputs:
     options: [ifx, ifort]
   force-cache-save:
     description: 'Save cache as long as toolkit installation is successful (i.e., do not wait for whole workflow to finish)'
-    default: false
+    default: true
 
 runs:
   using: "composite"
@@ -178,8 +178,8 @@ runs:
         diff --unchanged-line-format= --old-line-format= --new-line-format='%L' /tmp/before.txt /tmp/after.txt > /tmp/update.txt || true
         cat /tmp/update.txt |& tee -a $GITHUB_ENV
 
-    - name: "Debug: Print environment updates"
-      if: ${{ runner.debug == '1' }}
+    - name: "Debug output"
+      if: ${{ always() && runner.debug == '1' }}
       shell: ${{ inputs.shell }}
       run: |
         echo "=== Contents of /tmp/update.txt ==="

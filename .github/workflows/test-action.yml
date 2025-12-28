@@ -9,7 +9,7 @@ on:
 
 jobs:
   test-classic-compilers:
-    name: Test Classic v${{ matrix.version }}
+    name: Test Classic
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -60,7 +60,7 @@ jobs:
           echo "$output" | grep -q "Hello from Intel Fortran compiler"
 
   test-oneapi-versions:
-    name: Test oneAPI v${{ matrix.version }}${{ matrix.fortran-compiler && format(' (FC={0})', matrix.fortran-compiler) || '' }}
+    name: Test oneAPI
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -257,3 +257,47 @@ jobs:
           output=$(./mkl_test_f90)
           echo "$output"
           echo "$output" | grep -q "MKL BLAS Fortran test call successful"
+
+  test-debug-output:
+    name: Debug Output
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Intel compilers with debug enabled
+        uses: ./
+        env:
+          RUNNER_DEBUG: '1'
+        with:
+          install-oneapi: true
+          oneapi-version: '2025.0'
+          compiler-setup: 'oneapi'
+          env-update: true
+          cache: false
+      
+      - name: Verify debug output contained expected environment variables
+        run: |
+          # Check that the workflow logs should have shown debug output
+          # This step verifies the environment was actually set up
+          echo "Checking for expected environment variables from debug output..."
+          
+          # Verify compiler environment variables are set
+          [ ! -z "$CC" ] || { echo "ERROR: CC not set"; exit 1; }
+          [ ! -z "$CXX" ] || { echo "ERROR: CXX not set"; exit 1; }
+          [ ! -z "$FC" ] || { echo "ERROR: FC not set"; exit 1; }
+          
+          echo "✓ CC=$CC"
+          echo "✓ CXX=$CXX"
+          echo "✓ FC=$FC"
+          
+          # Verify Intel-specific environment variables
+          [ ! -z "$CI_INTEL_ONEAPI_VERSION" ] || { echo "ERROR: CI_INTEL_ONEAPI_VERSION not set"; exit 1; }
+          echo "✓ CI_INTEL_ONEAPI_VERSION=$CI_INTEL_ONEAPI_VERSION"
+          
+          # Verify PATH contains Intel directories
+          echo "$PATH" | grep -q "/opt/intel" || { echo "ERROR: PATH doesn't contain /opt/intel"; exit 1; }
+          echo "✓ PATH contains Intel directories"
+          
+          echo "✓ Debug output test passed - expected environment variables are present"

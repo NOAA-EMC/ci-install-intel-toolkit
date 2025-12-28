@@ -1,7 +1,8 @@
 name: 'CI: Test ci-install-intel-toolkit action'
 
 on:
-  push: [develop]
+  push:
+  - develop
   pull_request:
   workflow_dispatch:
   schedule:

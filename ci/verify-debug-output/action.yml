@@ -1,0 +1,41 @@
+name: 'Verify Debug Output'
+description: 'Verifies that debug output environment variables are correctly set'
+
+runs:
+  using: "composite"
+  
+  steps:
+    - name: Verify debug output contained expected environment variables
+      shell: bash
+      run: |
+        echo "Verifying environment variables from debug output..."
+        
+        # Verify compiler environment variables are set
+        [ ! -z "$CC" ] || { echo "ERROR: CC not set"; exit 1; }
+        [ ! -z "$CXX" ] || { echo "ERROR: CXX not set"; exit 1; }
+        [ ! -z "$FC" ] || { echo "ERROR: FC not set"; exit 1; }
+        
+        echo "✓ CC=$CC"
+        echo "✓ CXX=$CXX"
+        echo "✓ FC=$FC"
+        
+        # Verify Intel-specific environment variables if set
+        if [ ! -z "$CI_INTEL_ONEAPI_VERSION" ]; then
+          echo "✓ CI_INTEL_ONEAPI_VERSION=$CI_INTEL_ONEAPI_VERSION"
+        fi
+        
+        if [ ! -z "$CI_INTEL_CLASSIC_VERSION" ]; then
+          echo "✓ CI_INTEL_CLASSIC_VERSION=$CI_INTEL_CLASSIC_VERSION"
+        fi
+        
+        # Verify PATH contains Intel directories
+        echo "$PATH" | grep -q "/opt/intel" || { echo "ERROR: PATH doesn't contain /opt/intel"; exit 1; }
+        echo "✓ PATH contains Intel directories"
+        
+        # Verify LD_LIBRARY_PATH if set
+        if [ ! -z "$LD_LIBRARY_PATH" ]; then
+          echo "$LD_LIBRARY_PATH" | grep -q "/opt/intel" || { echo "WARNING: LD_LIBRARY_PATH doesn't contain /opt/intel"; }
+          echo "✓ LD_LIBRARY_PATH contains Intel directories"
+        fi
+        
+        echo "✓ Debug output verification passed"

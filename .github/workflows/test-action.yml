@@ -1,7 +1,7 @@
 name: 'CI: Test ci-install-intel-toolkit action'
 
 on:
-  push: [develop]
+  push:
   pull_request:
   workflow_dispatch:
   schedule:
@@ -26,6 +26,8 @@ jobs:
       
       - name: Install Intel Classic compilers
         uses: ./
+        env:
+          RUNNER_DEBUG: '1'
         with:
           install-classic: true
           classic-version: ${{ matrix.version }}
@@ -34,6 +36,9 @@ jobs:
           compiler-setup: 'classic'
           env-update: true
           cache: false
+      
+      - name: Verify debug output
+        uses: ./ci/verify-debug-output
       
       - name: Verify Classic compilers
         run: bash ci/verify-classic-compilers.sh
@@ -82,6 +87,8 @@ jobs:
       
       - name: Install Intel oneAPI compilers
         uses: ./
+        env:
+          RUNNER_DEBUG: '1'
         with:
           install-classic: true
           install-oneapi: true
@@ -90,6 +97,9 @@ jobs:
           compiler-setup: 'oneapi'
           env-update: true
           cache: false
+      
+      - name: Verify debug output
+        uses: ./ci/verify-debug-output
       
       - name: Verify oneAPI compilers
         run: bash ci/verify-oneapi-compilers.sh ${{ matrix.fortran-compiler }}
@@ -259,7 +269,7 @@ jobs:
           echo "$output" | grep -q "MKL BLAS Fortran test call successful"
 
   test-debug-output:
-    name: Debug Output
+    name: Test Debug Output
     runs-on: ubuntu-latest
     
     steps:
@@ -272,7 +282,7 @@ jobs:
           RUNNER_DEBUG: '1'
         with:
           install-oneapi: true
-          oneapi-version: '2025.0'
+          oneapi-version: '2025.3'
           compiler-setup: 'oneapi'
           env-update: true
           cache: false

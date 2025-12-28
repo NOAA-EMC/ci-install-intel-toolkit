@@ -1,5 +1,7 @@
 # GitHub CI Action: install-intel-toolkit
 
+![Test action](https://github.com/NOAA-EMC/ci-install-intel-toolkit/actions/workflows/test-action.yml/badge.svg)
+
 This repository provides a GitHub Action for download and caching the Intel
 Classic and oneAPI compilers for Linux, as well as OpenMP, MPI, and MKL.
 

@@ -49,6 +49,11 @@ inputs:
   compiler-setup:
     description: 'Set CC, CXX, FC as part of environment setup ("env-update"); choose "oneapi" or "classic"'
     default: ''
+  oneapi-fortran-compiler:
+    description: 'Set FC to ifx or ifort for oneAPI compilers (ifort only available 2023.x & 2024.x)'
+    default: ifx
+    type: choice
+    options: [ifx, ifort]
   force-cache-save:
     description: 'Save cache as long as toolkit installation is successful (i.e., do not wait for whole workflow to finish)'
     default: false
@@ -147,15 +152,15 @@ runs:
         echo 'Updating $GITHUB_ENV'
         bash -c "env > /tmp/before.txt"
         if [[ "${{ inputs.compiler-setup }}" == "oneapi" || "${{ inputs.mpi-wrapper-setup }}" == "oneapi" ]]; then
-          echo -e "CC=icx\nCXX=icpx\nFC=ifx" >> $GITHUB_ENV
+          echo -e "CC=icx\nCXX=icpx\nFC=${{ inputs.oneapi-fortran-compiler }}" >> $GITHUB_ENV
           . /opt/intel/oneapi/compiler/${{ inputs.oneapi-version }}/env/vars.sh
         elif [[ "${{ inputs.compiler-setup }}" == "classic" || "${{ inputs.mpi-wrapper-setup }}" == "classic" ]]; then
           echo -e "CC=icc\nCXX=icpc\nFC=ifort" >> $GITHUB_ENV
           . /opt/intel/oneapi/compiler/${{ inputs.classic-version }}/env/vars.sh
         fi
         if [ "${{ inputs.mpi-wrapper-setup }}" == "oneapi" ]; then
-          echo -e "CC=mpiicx\nCXX=mpiicpx\nFC=mpiifx" >> $GITHUB_ENV
-          echo -e "I_MPI_CC=icx\nI_MPI_CXX=icpx\nI_MPI_FC=ifx\nI_MPI_F77=ifx" >> $GITHUB_ENV
+          echo -e "CC=mpiicx\nCXX=mpiicpx\nFC=mpi${{ inputs.oneapi-fortran-compiler }}" >> $GITHUB_ENV
+          echo -e "I_MPI_CC=icx\nI_MPI_CXX=icpx\nI_MPI_FC=${{ inputs.oneapi-fortran-compiler }}\nI_MPI_F77=${{ inputs.oneapi-fortran-compiler }}" >> $GITHUB_ENV
           . /opt/intel/oneapi/mpi/${{ inputs.mpi-version }}/env/vars.sh
         elif [ "${{ inputs.mpi-wrapper-setup }}" == "classic" ]; then
           echo -e "CC=mpiicc\nCXX=mpiicpc\nFC=mpiifort" >> $GITHUB_ENV
@@ -172,3 +177,10 @@ runs:
         env > /tmp/after.txt
         diff --unchanged-line-format= --old-line-format= --new-line-format='%L' /tmp/before.txt /tmp/after.txt > /tmp/update.txt || true
         cat /tmp/update.txt |& tee -a $GITHUB_ENV
+
+    - name: "Debug: Print environment updates"
+      if: ${{ runner.debug == '1' }}
+      shell: ${{ inputs.shell }}
+      run: |
+        echo "=== Contents of /tmp/update.txt ==="
+        cat /tmp/update.txt

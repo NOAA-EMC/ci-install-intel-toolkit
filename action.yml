@@ -172,3 +172,10 @@ runs:
         env > /tmp/after.txt
         diff --unchanged-line-format= --old-line-format= --new-line-format='%L' /tmp/before.txt /tmp/after.txt > /tmp/update.txt || true
         cat /tmp/update.txt |& tee -a $GITHUB_ENV
+
+    - name: "Debug: Print environment updates"
+      if: ${{ runner.debug == '1' }}
+      shell: ${{ inputs.shell }}
+      run: |
+        echo "=== Contents of /tmp/update.txt ==="
+        cat /tmp/update.txt

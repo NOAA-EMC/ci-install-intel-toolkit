@@ -1,4 +1,4 @@
-name: Test Intel Toolkit Action
+name: 'CI: Test ci-install-intel-toolkit action'
 
 on:
   push:

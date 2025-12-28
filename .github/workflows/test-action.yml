@@ -60,12 +60,18 @@ jobs:
           echo "$output" | grep -q "Hello from Intel Fortran compiler"
 
   test-oneapi-versions:
-    name: Test oneAPI v${{ matrix.version }}
+    name: Test oneAPI v${{ matrix.version }}${{ matrix.fortran-compiler && format(' (FC={0})', matrix.fortran-compiler) || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        version: ['2023.2.1', '2025.3']
+        include:
+          - version: '2023.2.1'
+            fortran-compiler: 'ifx'
+          - version: '2023.2.1'
+            fortran-compiler: 'ifort'
+          - version: '2025.3'
+            fortran-compiler: 'ifx'
     
     steps:
       - name: Checkout repository
@@ -80,12 +86,13 @@ jobs:
           install-classic: true
           install-oneapi: true
           oneapi-version: ${{ matrix.version }}
+          oneapi-fortran-compiler: ${{ matrix.fortran-compiler }}
           compiler-setup: 'oneapi'
           env-update: true
           cache: false
       
       - name: Verify oneAPI compilers
-        run: bash ci/verify-oneapi-compilers.sh
+        run: bash ci/verify-oneapi-compilers.sh ${{ matrix.fortran-compiler }}
       
       - name: Test oneAPI C compilation
         run: |
@@ -103,7 +110,7 @@ jobs:
       
       - name: Test oneAPI Fortran compilation
         run: |
-          ifx -v ci/hello.f90 -o test_f90
+          $FC -v ci/hello.f90 -o test_f90
           output=$(./test_f90)
           echo "$output"
           echo "$output" | grep -q "Hello from Intel Fortran compiler"

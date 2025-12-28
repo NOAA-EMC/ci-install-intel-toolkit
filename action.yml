@@ -50,8 +50,10 @@ inputs:
     description: 'Set CC, CXX, FC as part of environment setup ("env-update"); choose "oneapi" or "classic"'
     default: ''
   oneapi-fortran-compiler:
-    description: 'Choose ifx or ifort for oneAPI Fortran compiler (ifort only available 2023.x & 2024.x)'
+    description: 'Set FC to ifx or ifort for oneAPI compilers (ifort only available 2023.x & 2024.x)'
     default: ifx
+    type: choice
+    options: [ifx, ifort]
   force-cache-save:
     description: 'Save cache as long as toolkit installation is successful (i.e., do not wait for whole workflow to finish)'
     default: false

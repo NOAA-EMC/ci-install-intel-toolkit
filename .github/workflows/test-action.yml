@@ -1,10 +1,11 @@
-name: Test Intel Toolkit Action
+name: 'CI: Test ci-install-intel-toolkit action'
 
 on:
   push:
-    branches: [develop]
   pull_request:
   workflow_dispatch:
+  schedule:
+  - cron: '0 0 25 * *'
 
 jobs:
   test-classic-compilers:

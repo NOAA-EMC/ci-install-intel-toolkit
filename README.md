@@ -30,8 +30,6 @@ To use this Action, include the following step in your GitHub Actions workflow:
           mpi-wrapper-setup: oneapi
 ```
 
-The current default compiler versions are Intel Classic 2023.2.1 and Intel oneAPI 2025.3.
-
 <!-- action-docs-inputs source="action.yml" -->
 ### Inputs
 
@@ -43,7 +41,7 @@ The current default compiler versions are Intel Classic 2023.2.1 and Intel oneAP
 | `oneapi-version` | <p>Set Intel oneAPI version</p> | `false` | `2025.3` |
 | `install-mpi` | <p>Install Intel MPI libraries</p> | `false` | `false` |
 | `mpi-version` | <p>Set Intel MPI version</p> | `false` | `2021.10.0` |
-| `mpi-wrapper-setup` | <p>Choose compilers for MPI wrappers</p> | `false` | `none` |
+| `mpi-wrapper-setup` | <p>Choose compilers for MPI wrappers (options: classic, oneapi, none)</p> | `false` | `none` |
 | `install-openmp` | <p>Install Intel OpenMP libraries</p> | `false` | `false` |
 | `openmp-version` | <p>Set Intel OpenMP library version</p> | `false` | `2023.2.1` |
 | `install-mkl` | <p>Install Intel MKL</p> | `false` | `false` |
@@ -52,7 +50,7 @@ The current default compiler versions are Intel Classic 2023.2.1 and Intel oneAP
 | `cache` | <p>Cache to repository cache with actions/cache</p> | `false` | `true` |
 | `shell` | <p>Which shell to use/setup</p> | `false` | `bash` |
 | `compiler-setup` | <p>Set CC, CXX, FC as part of environment setup ("env-update"); choose "oneapi" or "classic"</p> | `false` | `""` |
-| `oneapi-fortran-compiler` | <p>Set FC to ifx or ifort for oneAPI compilers (ifort only available 2023.x &amp; 2024.x)</p> | `false` | `ifx` |
+| `oneapi-fortran-compiler` | <p>Set FC to ifx or ifort for oneAPI compilers (options: ifx, ifort; ifort only available 2023.x &amp; 2024.x)</p> | `false` | `ifx` |
 | `force-cache-save` | <p>Save cache as long as toolkit installation is successful (i.e., do not wait for whole workflow to finish)</p> | `false` | `true` |
 <!-- action-docs-inputs source="action.yml" -->
 

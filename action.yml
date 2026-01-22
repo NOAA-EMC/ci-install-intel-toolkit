@@ -24,8 +24,10 @@ inputs:
     description: 'Set Intel MPI version'
     default: '2021.10.0'
   mpi-wrapper-setup:
-    description: 'Choose whether to use "oneapi" or "classic" MPI wrapper, or "none"'
+    description: 'Choose compilers for MPI wrappers'
     default: 'none'
+    type: choice
+    options: [classic,oneapi,none]
   install-openmp:
     description: 'Install Intel OpenMP libraries'
     default: false
@@ -46,6 +48,7 @@ inputs:
     default: true
   shell:
     default: bash
+    description: 'Which shell to use/setup'
   compiler-setup:
     description: 'Set CC, CXX, FC as part of environment setup ("env-update"); choose "oneapi" or "classic"'
     default: ''

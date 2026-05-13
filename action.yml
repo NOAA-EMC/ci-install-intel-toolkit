@@ -60,6 +60,9 @@ inputs:
   force-cache-save:
     description: 'Save cache as long as toolkit installation is successful (i.e., do not wait for whole workflow to finish)'
     default: true
+  configure-gcc:
+    description: 'Run script for configuring GCC (gcc-install-dir/gcc-name)'
+    default: true
 
 runs:
   using: "composite"
@@ -129,7 +132,7 @@ runs:
         $sudo apt-get install -y --no-install-recommends --no-install-suggests $COMPONENTS
 
     - name: "Configure Intel compilers to use appropriate GCC version"
-      if: ${{ steps.intel-cache.outputs.cache-hit != 'true' }}
+      if: ${{ steps.intel-cache.outputs.cache-hit != 'true'  && inputs.configure-gcc == 'true' }}
       shell: ${{ inputs.shell }}
       run: |
         . /opt/intel/oneapi/setvars.sh

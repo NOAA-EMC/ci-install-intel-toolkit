@@ -133,7 +133,7 @@ runs:
       shell: ${{ inputs.shell }}
       run: |
         . /opt/intel/oneapi/setvars.sh
-        ${{ github.action_path }}/configure-intel-gcc.sh \
+        ${GITHUB_ACTION_PATH}/configure-intel-gcc.sh \
           "${{ inputs.install-classic }}" \
           "${{ inputs.install-oneapi }}" \
           "${{ inputs.classic-version }}" \

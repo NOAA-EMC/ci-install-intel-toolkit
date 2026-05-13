@@ -80,11 +80,12 @@ runs:
       shell: ${{ inputs.shell }}
       run: |
         cd /tmp
+        sudo=$(which sudo) # support instances without sudo command
         wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+        $sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
         rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo apt-get update
+        echo "deb https://apt.repos.intel.com/oneapi all main" | $sudo tee /etc/apt/sources.list.d/oneAPI.list
+        $sudo apt-get update
         if [ ${{ inputs.install-classic }} == true ]; then
           COMPONENTS+=" intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic"
           if [ ! -z ${{ inputs.classic-version }} ]; then
@@ -125,7 +126,7 @@ runs:
         fi
         # Run the installation
         echo "COMPONENTS: $COMPONENTS"
-        sudo apt-get install --no-install-recommends --no-install-suggests $COMPONENTS
+        $sudo apt-get install --no-install-recommends --no-install-suggests $COMPONENTS
 
     - name: "Configure Intel compilers to use appropriate GCC version"
       if: ${{ steps.intel-cache.outputs.cache-hit != 'true' }}

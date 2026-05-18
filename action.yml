@@ -71,7 +71,7 @@ runs:
 
     - name: "Cache setup"
       id: intel-cache
-      uses: actions/cache@v4
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
       if: ${{ inputs.cache }}
       with:
         path: /opt/intel
@@ -145,7 +145,7 @@ runs:
     - name: Always save Intel installation
       id: intel-cache-save
       if: ${{ steps.intel-install.outcome == 'success' && inputs.force-cache-save == 'true' }}
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae
       continue-on-error: true
       with:
         key: intel-${{ inputs.install-classic }}-${{ inputs.classic-version }}-${{ inputs.install-oneapi }}-${{ inputs.oneapi-version }}-${{ inputs.install-mpi }}-${{ inputs.mpi-version }}-${{ inputs.install-openmp }}-${{ inputs.openmp-version }}-${{ inputs.install-mkl }}-${{ inputs.mkl-version }}

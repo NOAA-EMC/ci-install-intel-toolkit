@@ -179,6 +179,7 @@ jobs:
       - name: Test MPI Fortran compilation and execution
         run: |
           $FC ci/mpi_hello.f90 -o mpi_test_f90
+          export I_MPI_FABRICS=shm:ofi FI_PROVIDER=tcp
           output=$(mpirun -n 2 ./mpi_test_f90)
           echo "$output"
           rank0_count=$(echo "$output" | grep -c "Hello from MPI rank.*0.*of.*2")

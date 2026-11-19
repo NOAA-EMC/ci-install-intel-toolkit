@@ -131,7 +131,7 @@ runs:
         $sudo apt-get install -y --no-install-recommends --no-install-suggests $COMPONENTS
 
     - name: "Configure Intel compilers to use appropriate GCC version"
-      if: ${{ steps.intel-cache.outputs.cache-hit != 'true'  && inputs.configure-gcc == 'true' }}
+      if: ${{ inputs.configure-gcc == 'true' }}
       shell: ${{ inputs.shell }}
       run: |
         . /opt/intel/oneapi/setvars.sh
